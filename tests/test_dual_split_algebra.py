@@ -196,7 +196,7 @@ class TestDualSplitFacade:
         assert multiply_many_dual_split_expressions(["eps", "eps", "e1"], dim=2) == "0"
 
     def test_mm_single(self):
-        assert multiply_many_dual_split_expressions(["e1 + eps"], dim=1) == "eps + e1"
+        assert multiply_many_dual_split_expressions(["e1 + eps"], dim=1) == "e1 + eps"
 
     def test_mm_empty_raises(self):
         with pytest.raises(ValueError):

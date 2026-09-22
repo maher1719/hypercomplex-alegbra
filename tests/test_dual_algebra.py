@@ -217,6 +217,7 @@ class TestDualParser:
 class TestDualFormatter:
     def setup_method(self):
         self.formatter = DualElementFormatter()
+        self.parser = DualElementParser()
 
     def test_format_base(self):
         assert self.formatter.format({(3, 0): 1.0}) == "e3"
@@ -243,6 +244,40 @@ class TestDualFormatter:
 
     def test_format_empty_is_zero(self):
         assert self.formatter.format({}) == "0"
+    # TestDualFormatter
+    def test_format_mixed(self):
+        # base first, then dual
+        result = self.formatter.format({(1, 0): 1.0, (3, 1): 2.0})
+        assert result == "e1 + 2eps_e3"   # unchanged here (already base-first)
+
+    def test_format_base_and_dual_interleaved_input(self):
+        # even if input alternates, output groups base then dual
+        result = self.formatter.format({(2, 1): 1.0, (1, 0): 1.0, (3, 0): 1.0})
+        assert result == "e1 + e3 + eps_e2"
+
+    # TestDualRoundTrip — add an interleaved case
+    @pytest.mark.parametrize("expr", [
+        "e1 + 2eps_e3",
+        "eps",
+        "3e2 - eps_e1",
+        "5",
+        "e1 + eps_e1",
+        "2e0 - 3eps_e2 + eps",
+        "e3 + eps_e1 + e1 + eps_e3",   # new: verifies regrouping
+    ])
+    def test_parse_format_roundtrip(self, expr):
+        parsed = self.parser.parse(expr)
+        formatted = self.formatter.format(parsed)
+        reparsed = self.parser.parse(formatted)
+        assert reparsed == parsed
+    def test_parsed_dual_elements(self):
+        exp="2eps_e3 + 1 - e3 + eps + e23 - 12eps_e1 + e4 - e231"
+        parsed_exp="1 - e3 + e4 + e23 - e231 + eps - 12eps_e1 + 2eps_e3"
+        try_parsed=self.parser.parse(exp)
+        try_parsed_formatted= self.formatter.format(try_parsed)
+        try_reparsed=self.parser.parse(try_parsed_formatted)
+        assert(parsed_exp==self.formatter.format(try_parsed))
+        assert(parsed_exp==self.formatter.format(try_reparsed))
 
 
 # ======================================================================
@@ -334,7 +369,7 @@ class TestDualFacade:
         assert multiply_many_dual_expressions(["eps", "eps", "e1"]) == "0"
 
     def test_multiply_many_dual_single(self):
-        assert multiply_many_dual_expressions(["e1 + eps"]) == "eps + e1"
+        assert multiply_many_dual_expressions(["e1 + eps"]) == "e1 + eps"
 
     def test_multiply_many_dual_empty_raises(self):
         with pytest.raises(ValueError):
