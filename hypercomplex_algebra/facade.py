@@ -1,60 +1,43 @@
-"""Public API: multiply two hypercomplex expression strings."""
-from .adapters import create_resolver
-from .core import BasisProductResolver, SparseMultiplier
-from .expression import ExpressionParser, ExpressionFormatter
+"""Facade: the simplest possible entry points.
 
-
-class ExpressionMultiplier:
-    """Multiplies two hypercomplex expression strings.
-
-    Composes: parser -> sparse multiplier -> formatter.
-    The algebra kind (and dim, for split) is fixed at construction, which
-    keeps standard/split — and different split dims — from ever mixing.
-    """
-
-    def __init__(
-        self,
-        kind: str = "standard",
-        dim: int | None = None,
-        resolver: BasisProductResolver | None = None,
-    ):
-        self._resolver = resolver if resolver is not None else create_resolver(kind, dim)
-        self._kind = kind
-        self._parser = ExpressionParser()
-        self._formatter = ExpressionFormatter()
-        self._multiplier = SparseMultiplier(self._resolver)
-
-    @property
-    def kind(self) -> str:
-        return self._kind
-
-    def multiply(self, expr_a: str, expr_b: str) -> str:
-        a = self._parser.parse(expr_a)
-        b = self._parser.parse(expr_b)
-        product = self._multiplier.multiply(a, b)
-        return self._formatter.format(product)
-
-
-# --- module-level convenience functions ----------------------------------
+Outermost layer. Holds ready-to-use multiplier instances (cached per
+algebra/dim) and exposes flat convenience functions. All real work is
+delegated to the application-layer ExpressionMultiplier.
+"""
+from .application import ExpressionMultiplier
 
 _standard_multiplier: ExpressionMultiplier | None = None
 _split_multipliers: dict[int, ExpressionMultiplier] = {}
 
 
-def multiply_expressions(expr_a: str, expr_b: str) -> str:
-    """Multiply two expressions in the standard algebra."""
+def _get_standard_multiplier() -> ExpressionMultiplier:
     global _standard_multiplier
     if _standard_multiplier is None:
         _standard_multiplier = ExpressionMultiplier(kind="standard")
-    return _standard_multiplier.multiply(expr_a, expr_b)
+    return _standard_multiplier
+
+
+def _get_split_multiplier(dim: int) -> ExpressionMultiplier:
+    if dim not in _split_multipliers:
+        _split_multipliers[dim] = ExpressionMultiplier(kind="split", dim=dim)
+    return _split_multipliers[dim]
+
+
+def multiply_expressions(expr_a: str, expr_b: str) -> str:
+    """ME: multiply two expressions in the standard algebra."""
+    return _get_standard_multiplier().multiply(expr_a, expr_b)
+
+
+def multiply_many_expressions(expressions) -> str:
+    """MM: left-fold a sequence of expressions in the standard algebra."""
+    return _get_standard_multiplier().multiply_many(expressions)
 
 
 def multiply_split_expressions(expr_a: str, expr_b: str, dim: int) -> str:
-    """Multiply two expressions in a split algebra of the given dim.
+    """ME for a split algebra at a fixed dim."""
+    return _get_split_multiplier(dim).multiply(expr_a, expr_b)
 
-    A separate multiplier is cached per dim. Mixing split dimensions is not
-    allowed — each dim is its own algebra and gets its own multiplier.
-    """
-    if dim not in _split_multipliers:
-        _split_multipliers[dim] = ExpressionMultiplier(kind="split", dim=dim)
-    return _split_multipliers[dim].multiply(expr_a, expr_b)
+
+def multiply_many_split_expressions(expressions, dim: int) -> str:
+    """MM for a split algebra at a fixed dim. Same dim rule as ME."""
+    return _get_split_multiplier(dim).multiply_many(expressions)

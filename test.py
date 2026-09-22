@@ -27,3 +27,22 @@ try:
     assert False, "should have raised"
 except ValueError as e:
     print("correctly raised:", e)
+
+
+
+
+from hypercomplex_algebra import ExpressionMultiplier
+
+m = ExpressionMultiplier(kind="split", dim=2)
+
+# default: enforce_check=True -> logs the check
+m.multiply_many(["e1", "e2"])
+# INFO MM check: all 2 expressions valid
+
+m.multiply_many(["e1", "0", "e2"])
+# INFO MM check: all 3 expressions valid
+# INFO MM check: product became zero; short-circuiting (all 3 expressions were validated)
+
+# skip the check
+fast = ExpressionMultiplier(kind="split", dim=2, enforce_check=False)
+print(fast.multiply_many(["e1", "e3"]))   # no check, no logs
