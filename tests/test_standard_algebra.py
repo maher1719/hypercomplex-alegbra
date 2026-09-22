@@ -2,8 +2,8 @@
 Full test suite for hypercomplex_algebra (sparse expression multiplier).
 
 Coverage:
-    1. ExpressionParser     — string → sparse dict, incl. malformed input
-    2. ExpressionFormatter  — sparse dict → string, ordering & pruning
+    1. ElementParser     — string → sparse dict, incl. malformed input
+    2. ElementFormatter  — sparse dict → string, ordering & pruning
     3. SparseMultiplier     — domain math, single-element-product property
     4. StandardResolver         — engine adapter, contract conformance
     5. ExpressionMultiplier — facade integration
@@ -20,9 +20,9 @@ from hypercomplex import build_table
 
 from hypercomplex_algebra import (
     BasisProductResolver,
-    ExpressionFormatter,
+    ElementFormatter,
     ExpressionMultiplier,
-    ExpressionParser,
+    ElementParser,
     StandardResolver,
     SparseMultiplier,
     multiply_expressions,
@@ -33,9 +33,9 @@ from hypercomplex_algebra import (
 # 1. PARSER
 # ======================================================================
 
-class TestExpressionParser:
+class TestElementParser:
     def setup_method(self):
-        self.parser = ExpressionParser()
+        self.parser = ElementParser()
 
     # --- basic forms ---
     def test_pure_scalar(self):
@@ -124,9 +124,9 @@ class TestExpressionParser:
 # 2. FORMATTER
 # ======================================================================
 
-class TestExpressionFormatter:
+class TestElementFormatter:
     def setup_method(self):
-        self.formatter = ExpressionFormatter()
+        self.formatter = ElementFormatter()
 
     def test_empty_is_zero(self):
         assert self.formatter.format({}) == "0"

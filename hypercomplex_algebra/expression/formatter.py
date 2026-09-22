@@ -1,7 +1,7 @@
 """Format {index: coefficient} back into an expression string."""
 
 
-class ExpressionFormatter:
+class ElementFormatter:
     """Formats {index: coefficient} into strings like '3 - 2.34e1 + e2'."""
 
     def __init__(self, tolerance: float = 1e-15):

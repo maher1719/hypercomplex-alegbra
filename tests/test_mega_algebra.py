@@ -26,9 +26,9 @@ import pytest
 from hypercomplex import FastStandard, build_table
 
 from hypercomplex_algebra import (
-    ExpressionFormatter,
+    ElementFormatter,
     ExpressionMultiplier,
-    ExpressionParser,
+    ElementParser,
     SparseMultiplier,
     SplitResolver,
     StandardResolver,
@@ -73,7 +73,7 @@ def _dicts_close(a, b, tol=1e-9):
 
 class TestParserAttack:
     def setup_method(self):
-        self.parser = ExpressionParser()
+        self.parser = ElementParser()
 
     @pytest.mark.parametrize("bad", [
         "",              # empty
@@ -126,7 +126,7 @@ class TestParserAttack:
 
 class TestFormatterAttack:
     def setup_method(self):
-        self.formatter = ExpressionFormatter()
+        self.formatter = ElementFormatter()
 
     def test_empty_is_zero(self):
         assert self.formatter.format({}) == "0"
@@ -253,8 +253,8 @@ class TestProperties:
     def setup_method(self):
         self.rng = random.Random(12345)
         self.mult = SparseMultiplier(StandardResolver())
-        self.parser = ExpressionParser()
-        self.formatter = ExpressionFormatter()
+        self.parser = ElementParser()
+        self.formatter = ElementFormatter()
 
     def test_multiplicative_identity(self):
         for _ in range(100):
@@ -343,13 +343,19 @@ class TestEngineZeroRejection:
         with pytest.raises(Exception):
             engine.multiply((1, 1), (0, 0))
     def test_zero_short_circuit_skips_later_elements(self):
-        # 'e99' is out of range for dim=2, but it comes AFTER a zero, so the
-        # fold short-circuits to "0" without ever validating it. Documented
-        # behavior: the result is correct; later elements are not checked.
-        assert multiply_many_split_expressions(["e1", "0", "e99"], dim=2) == "0"
+    # 'e99' is out of range for dim=2, but it comes AFTER a zero, so the
+    # fold short-circuits to "0" without ever validating it.
+    # NOTE: this only holds with enforce_check=False. The default
+    # enforce_check=True validates everything upfront (see companion test).
+        mult = ExpressionMultiplier(kind="split", dim=2, enforce_check=False)
+        assert mult.multiply_many(["e1", "0", "e99"]) == "0"
 
-    def test_zero_first_short_circuits_all(self):
-        assert multiply_many_split_expressions(["0", "e1", "e2"], dim=2) == "0"
+
+    def test_enforce_check_catches_out_of_range_even_after_zero(self):
+    # With the default enforce_check=True, 'e99' is validated upfront and
+    # raises, even though a zero earlier would short-circuit the result.
+        with pytest.raises(ValueError):
+            multiply_many_split_expressions(["e1", "0", "e99"], dim=2)
 
     def test_wrapper_never_produces_zero_tuple(self):
         # Our wrapper uses multiply_indices (ints), never (sign,index) tuples,
