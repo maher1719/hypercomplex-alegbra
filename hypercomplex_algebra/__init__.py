@@ -1,12 +1,27 @@
-from .facade import ExpressionMultiplier, multiply_expressions
-from .resolver import BasisProductResolver
-from .sparse import SparseMultiplier
-from .fast_resolver import FastResolver
-from .parser import ExpressionParser
-from .formatter import ExpressionFormatter
+"""hypercomplex_algebra: sparse expression multiplication on top of hypercomplex-engine."""
+
+from .core import BasisProductResolver, SparseMultiplier
+from .adapters import StandardResolver, SplitResolver, create_resolver
+from .expression import ExpressionParser, ExpressionFormatter
+from .facade import (
+    ExpressionMultiplier,
+    multiply_expressions,
+    multiply_split_expressions,
+)
 
 __all__ = [
-    "ExpressionMultiplier", "multiply_expressions",
-    "BasisProductResolver", "SparseMultiplier",
-    "FastResolver", "ExpressionParser", "ExpressionFormatter",
+    # core
+    "BasisProductResolver",
+    "SparseMultiplier",
+    # adapters
+    "StandardResolver",
+    "SplitResolver",
+    "create_resolver",
+    # expression
+    "ExpressionParser",
+    "ExpressionFormatter",
+    # facade
+    "ExpressionMultiplier",
+    "multiply_expressions",
+    "multiply_split_expressions",
 ]

@@ -2,6 +2,8 @@
 
 
 class ExpressionFormatter:
+    """Formats {index: coefficient} into strings like '3 - 2.34e1 + e2'."""
+
     def __init__(self, tolerance: float = 1e-15):
         self._tolerance = tolerance
 

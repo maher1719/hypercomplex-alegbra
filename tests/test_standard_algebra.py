@@ -5,7 +5,7 @@ Coverage:
     1. ExpressionParser     — string → sparse dict, incl. malformed input
     2. ExpressionFormatter  — sparse dict → string, ordering & pruning
     3. SparseMultiplier     — domain math, single-element-product property
-    4. FastResolver         — engine adapter, contract conformance
+    4. StandardResolver         — engine adapter, contract conformance
     5. ExpressionMultiplier — facade integration
     6. Cross-validation     — verified against hypercomplex.build_table
     7. Edge cases           — associativity, cancellation, identities
@@ -23,7 +23,7 @@ from hypercomplex_algebra import (
     ExpressionFormatter,
     ExpressionMultiplier,
     ExpressionParser,
-    FastResolver,
+    StandardResolver,
     SparseMultiplier,
     multiply_expressions,
 )
@@ -97,7 +97,7 @@ class TestExpressionParser:
         with pytest.raises(ValueError):
             self.parser.parse("e")
 
-            
+
     # --- large indices ---
     def test_large_index(self):
         assert self.parser.parse("e5000") == {5000: 1.0}
@@ -166,7 +166,7 @@ class TestExpressionFormatter:
 
 class TestSparseMultiplier:
     def setup_method(self):
-        self.mult = SparseMultiplier(FastResolver())
+        self.mult = SparseMultiplier(StandardResolver())
 
     def test_scalar_times_scalar(self):
         assert self.mult.multiply({0: 2.0}, {0: 3.0}) == {0: 6.0}
@@ -204,9 +204,9 @@ class TestSparseMultiplier:
 # 4. FAST RESOLVER (engine adapter)
 # ======================================================================
 
-class TestFastResolver:
+class TestStandardResolver:
     def setup_method(self):
-        self.resolver = FastResolver()
+        self.resolver = StandardResolver()
 
     def test_implements_contract(self):
         assert isinstance(self.resolver, BasisProductResolver)
@@ -284,7 +284,7 @@ class TestCrossValidation:
     def test_resolver_matches_table(self, n):
         signs, indices = build_table("standard", n)
         dim = 1 << n
-        resolver = FastResolver()
+        resolver = StandardResolver()
         for i in range(dim):
             for j in range(dim):
                 exp_sign, exp_idx = int(signs[i, j]), int(indices[i, j])
@@ -296,7 +296,7 @@ class TestCrossValidation:
     def test_sparse_multiplier_matches_table(self, n):
         signs, indices = build_table("standard", n)
         dim = 1 << n
-        mult = SparseMultiplier(FastResolver())
+        mult = SparseMultiplier(StandardResolver())
         for i in range(dim):
             for j in range(dim):
                 exp_sign, exp_idx = int(signs[i, j]), int(indices[i, j])

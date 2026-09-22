@@ -1,32 +1,60 @@
 """Public API: multiply two hypercomplex expression strings."""
-from .fast_resolver import FastResolver
-from .formatter import ExpressionFormatter
-from .parser import ExpressionParser
-from .resolver import BasisProductResolver
-from .sparse import SparseMultiplier
+from .adapters import create_resolver
+from .core import BasisProductResolver, SparseMultiplier
+from .expression import ExpressionParser, ExpressionFormatter
 
 
 class ExpressionMultiplier:
-    """Composes parser -> sparse multiplier -> formatter."""
+    """Multiplies two hypercomplex expression strings.
 
-    def __init__(self, resolver: BasisProductResolver | None = None):
-        resolver = resolver or FastResolver()
+    Composes: parser -> sparse multiplier -> formatter.
+    The algebra kind (and dim, for split) is fixed at construction, which
+    keeps standard/split — and different split dims — from ever mixing.
+    """
+
+    def __init__(
+        self,
+        kind: str = "standard",
+        dim: int | None = None,
+        resolver: BasisProductResolver | None = None,
+    ):
+        self._resolver = resolver if resolver is not None else create_resolver(kind, dim)
+        self._kind = kind
         self._parser = ExpressionParser()
         self._formatter = ExpressionFormatter()
-        self._multiplier = SparseMultiplier(resolver)
+        self._multiplier = SparseMultiplier(self._resolver)
+
+    @property
+    def kind(self) -> str:
+        return self._kind
 
     def multiply(self, expr_a: str, expr_b: str) -> str:
         a = self._parser.parse(expr_a)
         b = self._parser.parse(expr_b)
-        return self._formatter.format(self._multiplier.multiply(a, b))
+        product = self._multiplier.multiply(a, b)
+        return self._formatter.format(product)
 
 
-_default: ExpressionMultiplier | None = None
+# --- module-level convenience functions ----------------------------------
+
+_standard_multiplier: ExpressionMultiplier | None = None
+_split_multipliers: dict[int, ExpressionMultiplier] = {}
 
 
 def multiply_expressions(expr_a: str, expr_b: str) -> str:
-    """Module-level convenience function."""
-    global _default
-    if _default is None:
-        _default = ExpressionMultiplier()
-    return _default.multiply(expr_a, expr_b)
+    """Multiply two expressions in the standard algebra."""
+    global _standard_multiplier
+    if _standard_multiplier is None:
+        _standard_multiplier = ExpressionMultiplier(kind="standard")
+    return _standard_multiplier.multiply(expr_a, expr_b)
+
+
+def multiply_split_expressions(expr_a: str, expr_b: str, dim: int) -> str:
+    """Multiply two expressions in a split algebra of the given dim.
+
+    A separate multiplier is cached per dim. Mixing split dimensions is not
+    allowed — each dim is its own algebra and gets its own multiplier.
+    """
+    if dim not in _split_multipliers:
+        _split_multipliers[dim] = ExpressionMultiplier(kind="split", dim=dim)
+    return _split_multipliers[dim].multiply(expr_a, expr_b)
