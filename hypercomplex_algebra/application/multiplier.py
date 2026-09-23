@@ -108,12 +108,16 @@ class ExpressionMultiplier:
             identity = (0,) * self._resolver.num_slots
             for key in parsed:
                 self._resolver.resolve(key, identity)
-        elif self._kind in DUAL_KINDS:
-            for idx, eps in parsed:
-                self._resolver.resolve(idx, eps, 0, 0)
-        else:
-            for idx in parsed:
-                self._resolver.resolve(idx, 0)
+        else: 
+            try:
+                if self._kind in DUAL_KINDS:
+                    for idx, eps in parsed:
+                        self._resolver.resolve(idx, eps, 0, 0)
+                else:
+                    for idx in parsed:
+                        self._resolver.resolve(idx, 0)
+            except ValueError as e:
+                raise ValueError("unsupported format")
 
     # -- fast path (enforce_check=False) ----------------------------------
     def _multiply_many_fast(self, exprs):
