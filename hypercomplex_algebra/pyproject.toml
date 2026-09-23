@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hypercomplex-algebra"
+version = "0.1.0"
+description = "A high-performance, mathematically rigorous application layer for hypercomplex algebras (Standard, Split, Dual, Tensor)."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+authors = [
+    { name = "Maher Ben Abdessalem", email = "ba.maher94@gmail.com" }
+]
+keywords = [
+    "mathematics", "abstract-algebra", "hypercomplex", "cayley-dickson", 
+    "quaternions", "octonions", "tensor-products", "dual-numbers"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+# If your wrapper relies on the engine being installed, add it here:
+dependencies = [
+    "hypercomplex-engine>=0.4.2.4", 
+]
+
+[project.urls]
+Homepage = "https://github.com/maher1719/hypercomplex-algebra"
+Repository = "https://github.com/maher1719/hypercomplex-algebra"
+"Author ORCID" = "https://orcid.org/0000-0001-5948-9718"
+"Preprints (Figshare)" = "https://figshare.com/authors/maher_ben_abdessalem/13274766"
