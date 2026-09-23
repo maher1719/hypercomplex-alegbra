@@ -103,6 +103,7 @@ class TestTensorParser:
     def test_parse_negative(self):
         assert self.parser.parse("-e[1,2,0]") == {(1, 2, 0): -1.0}
 
+
     def test_parse_mixed(self):
         result = self.parser.parse("e[1,0,0] + 2e[0,1,3]")
         assert result == {(1, 0, 0): 1.0, (0, 1, 3): 2.0}
