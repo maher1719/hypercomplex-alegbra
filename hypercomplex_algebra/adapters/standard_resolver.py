@@ -4,7 +4,7 @@ This is the ONLY module that imports hypercomplex.
 """
 from hypercomplex import FastStandard
 
-from ..core.resolver import BasisProductResolver
+from ..core.base.resolver import BasisProductResolver
 
 
 class StandardResolver(BasisProductResolver):

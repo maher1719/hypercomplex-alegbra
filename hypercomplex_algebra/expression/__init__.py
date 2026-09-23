@@ -1,13 +1,14 @@
 from .tokenizer import tokenize
-from .parser import ElementParser
-from .parser_dual import DualElementParser
-from .formatter import ElementFormatter
-from .formatter_dual import DualElementFormatter
+from .base.parser import ElementParser
+from .base.formatter import ElementFormatter
+from .dual.parser import DualElementParser
+from .dual.formatter import DualElementFormatter
+from .tensor.parser import TensorElementParser
+from .tensor.formatter import TensorElementFormatter
 
 __all__ = [
     "tokenize",
-    "ElementParser",
-    "DualElementParser",
-    "ElementFormatter",
-    "DualElementFormatter",
+    "ElementParser", "ElementFormatter",
+    "DualElementParser", "DualElementFormatter",
+    "TensorElementParser", "TensorElementFormatter",
 ]

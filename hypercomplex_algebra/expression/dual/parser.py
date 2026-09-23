@@ -1,4 +1,4 @@
-from .tokenizer import tokenize
+from ..tokenizer import tokenize
 
 
 class DualElementParser:

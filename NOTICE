@@ -1,0 +1,11 @@
+hypercomplex-engine
+Copyright 2026 Maher Ben Abdessalem
+
+This software implements mathematical algorithms, block decompositions, and O(1) 
+bitwise closed-form sign evaluators originally authored and published by the 
+copyright holder in the following preprints:
+
+- 
+  Figshare DOI: 10.6084/m9.figshare.33705022
+- Unveiling the Structure of Cayley-Dickson Algebras: Zero Divisor Counting and Listing, and a Novel Sign Compression Scheme
+  Zenodo DOI: 10.5281/zenodo.22051873

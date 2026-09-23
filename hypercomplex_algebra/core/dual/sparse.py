@@ -1,5 +1,5 @@
 """Sparse dual multiplication. Keys are (index, eps_flag) tuples."""
-from .dual_resolver import DualResolver
+from .resolver import DualResolver
 
 
 class DualSparseMultiplier:

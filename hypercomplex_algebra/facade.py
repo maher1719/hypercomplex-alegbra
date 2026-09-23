@@ -10,6 +10,7 @@ _standard_multiplier: ExpressionMultiplier | None = None
 _split_multipliers: dict[int, ExpressionMultiplier] = {}
 _dual_multiplier: ExpressionMultiplier | None = None
 _dual_split_multipliers: dict[int, ExpressionMultiplier] = {}
+_tensor_multipliers: dict = {}
 
 
 def _get_standard_multiplier() -> ExpressionMultiplier:
@@ -36,6 +37,25 @@ def _get_dual_split_multiplier(dim: int) -> ExpressionMultiplier:
         _dual_split_multipliers[dim] = ExpressionMultiplier(kind="dual_split", dim=dim)
     return _dual_split_multipliers[dim]
 
+def _slots_key(slots):
+    """Normalize a slots spec into a hashable cache key."""
+    normalized = []
+    for slot in slots:
+        if isinstance(slot, (tuple, list)):
+            kind = slot[0]
+            dim = slot[1] if len(slot) > 1 else None
+        else:
+            kind, dim = slot, None
+        normalized.append((kind, dim))
+    return tuple(normalized)
+
+
+def _get_tensor_multiplier(slots) -> ExpressionMultiplier:
+    key = _slots_key(slots)
+    if key not in _tensor_multipliers:
+        _tensor_multipliers[key] = ExpressionMultiplier(kind="tensor", slots=slots)
+    return _tensor_multipliers[key]
+
 
 
 
@@ -60,8 +80,6 @@ def multiply_many_split_expressions(expressions, dim: int) -> str:
     return _get_split_multiplier(dim).multiply_many(expressions)
 
 
-
-
 def multiply_dual_expressions(expr_a: str, expr_b: str) -> str:
     """ME: multiply two expressions in the dual algebra (standard parent)."""
     return _get_dual_multiplier().multiply(expr_a, expr_b)
@@ -80,3 +98,13 @@ def multiply_dual_split_expressions(expr_a: str, expr_b: str, dim: int) -> str:
 def multiply_many_dual_split_expressions(expressions, dim: int) -> str:
     """MM: left-fold a sequence of expressions in a dual_split algebra."""
     return _get_dual_split_multiplier(dim).multiply_many(expressions)
+
+
+def multiply_tensor_expressions(expr_a: str, expr_b: str, slots) -> str:
+    """ME: multiply two expressions in a tensor product algebra."""
+    return _get_tensor_multiplier(slots).multiply(expr_a, expr_b)
+
+
+def multiply_many_tensor_expressions(expressions, slots) -> str:
+    """MM: left-fold a sequence of expressions in a tensor product algebra."""
+    return _get_tensor_multiplier(slots).multiply_many(expressions)

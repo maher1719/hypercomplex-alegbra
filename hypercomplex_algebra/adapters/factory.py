@@ -1,5 +1,6 @@
 """Factory for building resolvers from an algebra kind + config."""
-from ..core.resolver import BasisProductResolver
+from ..core.base.resolver import BasisProductResolver
+from ..core.tensor.resolver import TensorResolver
 from .standard_resolver import StandardResolver
 from .split_resolver import SplitResolver
 from .dual_standard_resolver import DualStandardResolver
@@ -15,12 +16,26 @@ def create_resolver(kind: str, dim: int | None = None):
             raise ValueError("dim is required for the split algebra")
         return SplitResolver(dim)
     if kind == "dual":
-        #Dual standard for now require no dimension
-        #if dim is None:
-        #    raise ValueError("dim is required for the split algebra")
-        return DualStandardResolver()          # dual over standard parent
+        return DualStandardResolver()
     if kind == "dual_split":
         if dim is None:
             raise ValueError("dim is required for the dual_split algebra")
-        return DualSplitResolver(dim)          # future: dual over split parent
+        return DualSplitResolver(dim)
     raise ValueError(f"Unknown algebra kind: {kind!r}")
+
+
+def create_tensor_resolver(slots):
+    """Build a TensorResolver from a list of slot specs.
+
+    Each slot is either a kind string ("standard") or a (kind, dim) tuple
+    (("split", 2)). Standard slots ignore dim; split slots require it.
+    """
+    slot_resolvers = []
+    for slot in slots:
+        if isinstance(slot, (tuple, list)):
+            kind = slot[0]
+            dim = slot[1] if len(slot) > 1 else None
+        else:
+            kind, dim = slot, None
+        slot_resolvers.append(create_resolver(kind, dim))
+    return TensorResolver(slot_resolvers)
