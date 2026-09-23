@@ -4,8 +4,8 @@
 **A mathematically rigorous, architecturally clean application layer for hypercomplex number systems.**
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+%20%7C%203.11%20%7C%203.12-yellow.svg)](https://www.python.org/downloads/)
-[![Tests](https://img.shields.io/badge/tests-113%20passed-brightgreen.svg)](https://github.com/maher1719/hypercomplex-algebra/actions)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+%20%7C%203.11%20%7C%203.13%20%7C%203.14-yellow.svg)](https://www.python.org/downloads/)
+[![Tests](https://img.shields.io/badge/tests-340+%20passed-brightgreen.svg)](https://github.com/maher1719/hypercomplex-algebra/actions)
 
 > *"Juniors are your future seniors. I am a junior at abstract algebra and hypercomplex numbers; I had an idea, and I executed it. Just as you were taught by seniors yesterday, teach juniors today, and let the sacred message pass on."*
 
@@ -34,7 +34,7 @@ It is built on top of [`hypercomplex-engine`](https://github.com/maher1719/hyper
 
 - **A human-readable expression language** (`"3e1 + 2eps_e2"`, `"e[1,3,2]"`)
 - **A clean parser/formatter pipeline** with zero silent faults
-- **An adversarial test suite** (113 tests) cross-validated against the engine's authoritative multiplication tables
+- **An adversarial test suite** (340+ tests) cross-validated against the engine's authoritative multiplication tables
 - **A resolver/factory/facade architecture** that scales to arbitrary algebra combinations without code changes
 
 This is not a toy. This is a **foundational computational package** designed to be relied upon, extended, and trusted.
