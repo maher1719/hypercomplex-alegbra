@@ -8,6 +8,7 @@ version = "0.1.0"
 description = "A high-performance, mathematically rigorous application layer for hypercomplex algebras (Standard, Split, Dual, Tensor)."
 readme = "README.md"
 license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
 requires-python = ">=3.10"
 authors = [
     { name = "Maher Ben Abdessalem", email = "ba.maher94@gmail.com" }
