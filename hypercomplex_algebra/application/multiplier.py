@@ -73,6 +73,7 @@ class ExpressionMultiplier:
             return self._multiply_many_checked(exprs)
         return self._multiply_many_fast(exprs)
 
+
     # -- checked path (enforce_check=True) --------------------------------
     def _multiply_many_checked(self, exprs):
         parsed_list = []
