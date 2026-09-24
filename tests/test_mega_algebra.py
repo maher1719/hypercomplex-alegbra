@@ -93,14 +93,21 @@ class TestParserAttack:
         with pytest.raises(ValueError, match="scientific"):
             self.parser.parse("1e-3")
 
-    def test_lone_sign_is_lenient_zero(self):
-        # A lone '+' or '-' has no terms -> parses to empty (zero).
-        # Documented lenient behavior; not a crash.
-        assert self.parser.parse("+") == {}
-        assert self.parser.parse("-") == {}
+    def test_lone_sign_is_rejected(self):
+        # A lone '+' or '-' has no term after it — that's a malformed
+        # expression, not zero. Silently accepting it would hide a typo.
+        with pytest.raises(ValueError):
+            self.parser.parse("+")
+        with pytest.raises(ValueError):
+            self.parser.parse("-")
 
-    def test_redundant_signs_lenient(self):
-        assert self.parser.parse("++e1") == {1: 1.0}
+    def test_redundant_or_trailing_signs_are_rejected(self):
+        with pytest.raises(ValueError):
+            self.parser.parse("++e1")
+        with pytest.raises(ValueError):
+            self.parser.parse("e1++e2")
+        with pytest.raises(ValueError):
+            self.parser.parse("e1+")
 
     def test_huge_index_parses(self):
         assert self.parser.parse("e999999") == {999999: 1.0}
@@ -342,20 +349,23 @@ class TestEngineZeroRejection:
             engine.multiply((0, 0), (1, 1))
         with pytest.raises(Exception):
             engine.multiply((1, 1), (0, 0))
-    def test_zero_short_circuit_skips_later_elements(self):
-    # 'e99' is out of range for dim=2, but it comes AFTER a zero, so the
-    # fold short-circuits to "0" without ever validating it.
-    # NOTE: this only holds with enforce_check=False. The default
-    # enforce_check=True validates everything upfront (see companion test).
-        mult = ExpressionMultiplier(kind="split", dim=2, enforce_check=False)
-        assert mult.multiply_many(["e1", "0", "e99"]) == "0"
-
-
-    def test_enforce_check_catches_out_of_range_even_after_zero(self):
-    # With the default enforce_check=True, 'e99' is validated upfront and
-    # raises, even though a zero earlier would short-circuit the result.
+    def test_out_of_range_caught_even_after_a_zero_short_circuits_the_fold(self):
+        # 'e99' is out of range for dim=2. Every expression is validated up
+        # front, before any multiplication happens, so this is caught even
+        # though a zero earlier in the list would otherwise short-circuit
+        # the fold before 'e99' is ever multiplied.
         with pytest.raises(ValueError):
             multiply_many_split_expressions(["e1", "0", "e99"], dim=2)
+
+    def test_out_of_range_error_message_is_specific_not_generic(self):
+        # The validation error must carry the resolver's real diagnosis
+        # (which dim, which bound) rather than a generic placeholder.
+        try:
+            multiply_many_split_expressions(["e1", "e99"], dim=2)
+            assert False, "should have raised"
+        except ValueError as e:
+            assert "dim=2" in str(e)
+            assert "0..3" in str(e)
 
     def test_wrapper_never_produces_zero_tuple(self):
         # Our wrapper uses multiply_indices (ints), never (sign,index) tuples,

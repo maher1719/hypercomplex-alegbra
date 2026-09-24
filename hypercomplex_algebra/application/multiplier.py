@@ -24,10 +24,8 @@ class ExpressionMultiplier:
         dim: int | None = None,
         slots=None,
         resolver=None,
-        enforce_check: bool = True,
     ):
         self._kind = kind
-        self._enforce_check = enforce_check
 
         # Resolver selection
         if resolver is not None:
@@ -65,16 +63,19 @@ class ExpressionMultiplier:
         return self._formatter.format(self._multiplier.multiply(a, b))
 
     def multiply_many(self, expressions) -> str:
-        """MM: multiply a sequence, left-associative. ((a·b)·c)·d ..."""
+        """MM: multiply a sequence, left-associative. ((a·b)·c)·d ...
+
+        Every expression is parsed and range-validated up front, before any
+        multiplication happens — including terms that a later zero would
+        otherwise short-circuit past. This is the only behavior; there is
+        no faster, unchecked mode. The validation is a resolve() call per
+        basis index (not a full multiplication), so the cost is small.
+        """
         exprs = list(expressions)
         if not exprs:
             raise ValueError("multiply_many needs at least one expression")
-        if self._enforce_check:
-            return self._multiply_many_checked(exprs)
-        return self._multiply_many_fast(exprs)
+        return self._multiply_many_checked(exprs)
 
-
-    # -- checked path (enforce_check=True) --------------------------------
     def _multiply_many_checked(self, exprs):
         parsed_list = []
         for k, expr in enumerate(exprs):
@@ -109,23 +110,15 @@ class ExpressionMultiplier:
             identity = (0,) * self._resolver.num_slots
             for key in parsed:
                 self._resolver.resolve(key, identity)
-        else: 
-            try:
-                if self._kind in DUAL_KINDS:
-                    for idx, eps in parsed:
-                        self._resolver.resolve(idx, eps, 0, 0)
-                else:
-                    for idx in parsed:
-                        self._resolver.resolve(idx, 0)
-            except ValueError as e:
-                raise ValueError("unsupported format")
-
-    # -- fast path (enforce_check=False) ----------------------------------
-    def _multiply_many_fast(self, exprs):
-        acc = self._parser.parse(exprs[0])
-        for expr in exprs[1:]:
-            b = self._parser.parse(expr)
-            acc = self._multiplier.multiply(acc, b)
-            if not acc:
-                return "0"
-        return self._formatter.format(acc)
+        else:
+            # Let the resolver's own ValueError (with its specific message —
+            # e.g. "Index out of range for split dim=3 (valid: 0..7)...")
+            # propagate as-is. It used to be caught here and replaced with a
+            # generic "unsupported format", which threw away the one piece
+            # of information the caller actually needed.
+            if self._kind in DUAL_KINDS:
+                for idx, eps in parsed:
+                    self._resolver.resolve(idx, eps, 0, 0)
+            else:
+                for idx in parsed:
+                    self._resolver.resolve(idx, 0)

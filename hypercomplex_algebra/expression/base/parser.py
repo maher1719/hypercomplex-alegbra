@@ -20,8 +20,10 @@ class ElementParser:
             coeff_str, index_str = body.split('e', 1)
             if not index_str or index_str[0] in "+-":
                 raise ValueError(
-                    f"Cannot parse '{body}': scientific-notation coefficients "
-                    f"(like 1e-3) are not supported. Use decimal form (e.g., 0.001)."
+                    f"Cannot parse '{body}': nothing recognizable after 'e'. "
+                    f"Basis indices are plain non-negative integers, e.g. 'e3', "
+                    f"not signed ('e-1') or exponential ('1e-3' — use decimal "
+                    f"form like 0.001 for scientific-notation coefficients)."
                 )
             magnitude = 1.0 if coeff_str == "" else float(coeff_str)
             index = int(index_str)
