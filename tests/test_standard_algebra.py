@@ -33,7 +33,7 @@ from hypercomplex_algebra import (
 # 1. PARSER
 # ======================================================================
 
-class TestElementParser:
+class TestStandardAlgebra:
     def setup_method(self):
         self.parser = ElementParser()
 
