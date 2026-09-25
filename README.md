@@ -278,7 +278,7 @@ Mobile & Web Software Engineer | Experimental & Computational Mathematician
 
 ### Preprints
 
-- *"A Proven Sign Law for Cayley-Dickson Algebras: Ordinary and Split Constructions"* — [Figshare](https://figshare.com/articles/preprint/A_Proven_Sign_Law_for_Cayley-Dickson_Algebras_Ordinary_and_Split_Constructions/33705022)
+- *"An O(1) Bitwise Evaluator for Cayley--Dickson Sign Structure: Ordinary, Split, Dual, and Tensor Constructions"* — [Figshare](https://figshare.com/articles/preprint/A_Proven_Sign_Law_for_Cayley-Dickson_Algebras_Ordinary_and_Split_Constructions/33705022)
 - *"Unveiling the Structure of Cayley-Dickson Algebras: Zero Divisor Counting, Alternative Constructions, and a Novel Sign Compression Scheme"* — [OSF Preprints](https://osf.io/preprints/osf/byqfw_v3)
 - *"Octonionic Associator Interactions"* — [Figshare](https://figshare.com/articles/preprint/Octonionic_Associator_Interactions_/33867982)
 
