@@ -1,4 +1,4 @@
-# hypercomplex-alegbra
+# hypercomplex-algebra
 
 
 **A mathematically rigorous, architecturally clean application layer for hypercomplex number systems.**
